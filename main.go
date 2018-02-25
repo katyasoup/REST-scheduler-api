@@ -20,7 +20,7 @@ const (
 var db *sql.DB
 var err error
 
-// multiple user rows into slice of Users
+// map multiple user rows into slice of Users
 func scanUsers(rows *sql.Rows) []User {
 	var users []User
 	var u User
@@ -32,6 +32,15 @@ func scanUsers(rows *sql.Rows) []User {
 	return users
 }
 
+// map single user row into User struct
+func scanUser(row *sql.Row) User {
+	var u User
+	row.Scan(&u.ID, &u.Name, &u.Role, &u.Email, &u.Phone, &u.Created, &u.Updated)
+	fmt.Println(u)
+	return u
+}
+
+// retrieve results of scanUsers
 func getUsers(queryString string) []User {
 	rows, err := db.Query(queryString)
 	defer rows.Close()
@@ -43,7 +52,17 @@ func getUsers(queryString string) []User {
 	return results
 }
 
-// multiple shift rows into slice of Shifts
+// retrieve results of scanUser
+func getUser(queryString string) User {
+	row := db.QueryRow(queryString)
+	results := scanUser(row)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return results
+}
+
+// map multiple shift rows into slice of Shifts
 func scanShifts(rows *sql.Rows) []Shift {
 	var shifts []Shift
 	var s Shift
@@ -55,6 +74,15 @@ func scanShifts(rows *sql.Rows) []Shift {
 	return shifts
 }
 
+// map single shift row into Shift struct
+func scanShift(row *sql.Row) Shift {
+	var s Shift
+	row.Scan(&s.ID, &s.Manager, &s.Employee, &s.Break, &s.Start, &s.End, &s.Created, &s.Updated)
+	fmt.Println(s)
+	return s
+}
+
+// retrieve results of scanShifts
 func getShifts(queryString string) []Shift {
 	rows, err := db.Query(queryString)
 	defer rows.Close()
@@ -66,7 +94,17 @@ func getShifts(queryString string) []Shift {
 	return results
 }
 
-// User : for retrieval of user rows from db
+// retrieve results of scanShift
+func getShift(queryString string) Shift {
+	row := db.QueryRow(queryString)
+	results := scanShift(row)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return results
+}
+
+// User : for storing retrieval of user rows from db
 type User struct {
 	ID      int64
 	Name    string
@@ -77,7 +115,7 @@ type User struct {
 	Updated string
 }
 
-// Shift : for retrieval of shift rows from db
+// Shift : for storing retrieval of shift rows from db
 type Shift struct {
 	ID       int64
 	Manager  int64
@@ -115,14 +153,10 @@ func main() {
 
 	// get single shift by id
 	routes.GET("/Shifts/:id", func(c *gin.Context) {
-		var s Shift
 		idParam := c.Params.ByName("id")
 		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE id=%s", idParam)
-		row := db.QueryRow(queryString)
-
-		row.Scan(&s.ID, &s.Manager, &s.Employee, &s.Break, &s.Start, &s.End, &s.Created, &s.Updated)
-		fmt.Println(s)
-		c.JSON(200, s)
+		result := getShift(queryString)
+		c.JSON(200, result)
 	})
 	// get all shifts for single employee
 	routes.GET("/employeeShifts/:id", func(c *gin.Context) {
@@ -146,14 +180,10 @@ func main() {
 
 	// get single EMPLOYEE by id
 	routes.GET("/Employees/:id", func(c *gin.Context) {
-		var u User
 		idParam := c.Params.ByName("id")
 		queryString := fmt.Sprintf("SELECT * FROM public.users WHERE role='employee' AND id=%s", idParam)
-		row := db.QueryRow(queryString)
-
-		row.Scan(&u.ID, &u.Name, &u.Role, &u.Email, &u.Phone, &u.Created, &u.Updated)
-		fmt.Println(u)
-		c.JSON(200, u)
+		result := getUser(queryString)
+		c.JSON(200, result)
 	})
 
 	routes.Run()
