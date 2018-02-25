@@ -148,5 +148,22 @@ func main() {
 		c.JSON(200, "Hook up shifts query!")
 	})
 
+	r.GET("/Employees", func(c *gin.Context) {
+		rows, err := db.Query("SELECT * FROM public.users WHERE role='employee'")
+		defer rows.Close()
+
+		for rows.Next() {
+			rows.Scan(&id, &name, &role, &email, &phone, &createdAt, &updatedAt)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(id, name, role, email, phone, createdAt, updatedAt)
+			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
+		}
+		c.JSON(200, results)
+
+		c.JSON(200, "Hook up shifts query!")
+	})
+
 	r.Run()
 }
