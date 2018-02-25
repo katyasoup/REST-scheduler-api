@@ -106,8 +106,8 @@ func getShift(queryString string) Shift {
 
 //
 func createShift(shift Shift) Shift {
-	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES(%d, %d, %f, '%s', '%s');",
-		shift.Manager, shift.Employee.Int64, shift.Break, shift.Start, shift.End)
+	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES(%d, %f, '%s', '%s');",
+		shift.Manager, shift.Break, shift.Start, shift.End)
 
 	fmt.Println(queryString)
 	rows, err := db.Query(queryString)
