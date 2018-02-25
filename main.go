@@ -173,7 +173,7 @@ func main() {
 	routes.GET("/schedule/:start/:end", func(c *gin.Context) {
 		startParam := c.Params.ByName("start")
 		endParam := c.Params.ByName("end")
-		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE start_time>%s AND end_time<%s", startParam, endParam)
+		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE start_time>'%s' AND end_time<'%s'", startParam, endParam)
 		results := getShifts(queryString)
 		c.JSON(200, results)
 	})
