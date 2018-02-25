@@ -113,6 +113,25 @@ func main() {
 		c.JSON(200, results)
 	})
 
+	// get single shift by id
+	routes.GET("/Shifts/:id", func(c *gin.Context) {
+		var s Shift
+		idParam := c.Params.ByName("id")
+		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE id=%s", idParam)
+		row := db.QueryRow(queryString)
+
+		row.Scan(&s.ID, &s.Manager, &s.Employee, &s.Break, &s.Start, &s.End, &s.Created, &s.Updated)
+		fmt.Println(s)
+		c.JSON(200, s)
+	})
+	// get all shifts for single employee
+	routes.GET("/employeeShifts/:id", func(c *gin.Context) {
+		idParam := c.Params.ByName("id")
+		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%s", idParam)
+		results := getShifts(queryString)
+		c.JSON(200, results)
+	})
+
 	// get all users
 	routes.GET("/Users", func(c *gin.Context) {
 		results := getUsers("SELECT * FROM public.users")
