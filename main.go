@@ -63,6 +63,30 @@ func getUser(queryString string) User {
 	return results
 }
 
+func getAllUsers() []User {
+	return getUsers("SELECT * FROM public.users")
+}
+
+func getUserByID(id int64) User {
+	return getUser(fmt.Sprintf("SELECT * FROM public.users WHERE id=%d", id))
+}
+
+func getAllEmployees() []User {
+	return getUsers("SELECT * FROM public.users WHERE role='employee'")
+}
+
+func getEmployeeByID(id int64) User {
+	return getUser(fmt.Sprintf("SELECT * FROM public.users WHERE role='employee' AND id=%d", id))
+}
+
+func getAllManagers() []User {
+	return getUsers("SELECT * FROM public.users WHERE role='manager'")
+}
+
+func getManagerByID(id int64) User {
+	return getUser(fmt.Sprintf("SELECT * FROM public.users WHERE role='manager' AND id=%d", id))
+}
+
 // map multiple shift rows into slice of Shifts
 func scanShifts(rows *sql.Rows) []Shift {
 	var shifts []Shift
@@ -110,14 +134,21 @@ func getAllShifts() []Shift {
 }
 
 func getShiftByID(id int64) Shift {
-	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE id=%d", id))[0]
+	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE id=%d", id))
+}
+
+func getMyShifts(id int64) []Shift {
+	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%d", id))
+}
+
+func getSchedule(start string, end string) []Shift {
+	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE start_time>'%s' AND end_time<'%s'", start, end))
 }
 
 //
 func createShift(shift Shift) Shift {
 	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES(%d, %f, '%s', '%s');",
 		shift.Manager, shift.Break, shift.Start, shift.End)
-
 	fmt.Println(queryString)
 	rows, err := db.Query(queryString)
 	defer rows.Close()
@@ -177,7 +208,7 @@ func main() {
 
 	routes := gin.Default()
 
-	// get SHIFTS:
+	// SHIFT routes:
 
 	// get all shifts
 	routes.GET("/shifts", func(c *gin.Context) {
@@ -194,77 +225,69 @@ func main() {
 
 	// get all shifts for single employee
 	routes.GET("/myshifts/:id", func(c *gin.Context) {
-		idParam := c.Params.ByName("id")
-		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%s", idParam)
-		results := getShifts(queryString)
+		id := stringToInt64(c.Param("id"))
+		results := getMyShifts(id)
 		c.JSON(200, results)
 	})
 
 	// get all shifts for date range
 	routes.GET("/schedule/:start/:end", func(c *gin.Context) {
-		startParam := c.Params.ByName("start")
-		endParam := c.Params.ByName("end")
-		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE start_time>'%s' AND end_time<'%s'", startParam, endParam)
-		results := getShifts(queryString)
+		start := c.Params.ByName("start")
+		end := c.Params.ByName("end")
+		results := getSchedule(start, end)
 		c.JSON(200, results)
 	})
 
-	// create shift
+	// add new shift
 	routes.POST("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
-
 		result := createShift(shift)
-
 		if err != nil {
 			c.JSON(500, gin.H{"Error": err})
 		} else {
-
 			c.JSON(201, gin.H{"success": result})
 		}
 	})
 
-	// get USERS:
+	// USER routes:
 
 	// get all users
 	routes.GET("/users", func(c *gin.Context) {
-		results := getUsers("SELECT * FROM public.users")
+		results := getAllUsers()
 		c.JSON(200, results)
 	})
 
 	// get single user by id
 	routes.GET("/users/:id", func(c *gin.Context) {
-		idParam := c.Params.ByName("id")
-		queryString := fmt.Sprintf("SELECT * FROM public.users WHERE id=%s", idParam)
-		result := getUser(queryString)
+		id := stringToInt64(c.Param("id"))
+		result := getUserByID(id)
 		c.JSON(200, result)
 	})
 
 	// get all users with role of employee
 	routes.GET("/employees", func(c *gin.Context) {
-		results := getUsers("SELECT * FROM public.users WHERE role='employee'")
+		results := getAllEmployees()
 		c.JSON(200, results)
 	})
 
 	// get single employee by id
 	routes.GET("/employees/:id", func(c *gin.Context) {
-		idParam := c.Params.ByName("id")
-		queryString := fmt.Sprintf("SELECT * FROM public.users WHERE role='employee' AND id=%s", idParam)
-		result := getUser(queryString)
+		id := stringToInt64(c.Param("id"))
+		result := getEmployeeByID(id)
 		c.JSON(200, result)
 	})
 
 	// get all users with role of manager
 	routes.GET("/managers", func(c *gin.Context) {
-		results := getUsers("SELECT * FROM public.users WHERE role='manager'")
+		results := getAllManagers()
 		c.JSON(200, results)
 	})
 
 	// get single manager by id
 	routes.GET("/managers/:id", func(c *gin.Context) {
-		idParam := c.Params.ByName("id")
-		queryString := fmt.Sprintf("SELECT * FROM public.users WHERE role='manager' AND id=%s", idParam)
-		result := getUser(queryString)
+		id := stringToInt64(c.Param("id"))
+		result := getManagerByID(id)
 		c.JSON(200, result)
 	})
 
