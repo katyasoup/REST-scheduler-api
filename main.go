@@ -104,7 +104,7 @@ func getShifts(queryString string) []Shift {
 
 // User : for retrieval of user rows from db
 type User struct {
-	ID      int32
+	ID      int64
 	Name    string
 	Role    string
 	Email   string
@@ -115,10 +115,10 @@ type User struct {
 
 // Shift : for retrieval of shift rows from db
 type Shift struct {
-	ID       int32
-	Manager  int32
+	ID       int64
+	Manager  int64
 	Employee NullInt64
-	Break    float32
+	Break    float64
 	Start    string
 	End      string
 	Created  string
