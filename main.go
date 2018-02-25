@@ -104,6 +104,21 @@ func getShift(queryString string) Shift {
 	return results
 }
 
+//
+func createShift(shift Shift) Shift {
+	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES(%d, %d, %f, '%s', '%s');",
+		shift.Manager, shift.Employee.Int64, shift.Break, shift.Start, shift.End)
+
+	fmt.Println(queryString)
+	rows, err := db.Query(queryString)
+	defer rows.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows.Close()
+	return shift
+}
+
 // User : for storing retrieval of user rows from db
 type User struct {
 	ID      int64
@@ -117,14 +132,14 @@ type User struct {
 
 // Shift : for storing retrieval of shift rows from db
 type Shift struct {
-	ID       int64
-	Manager  int64
-	Employee NullInt64
-	Break    float64
-	Start    string
-	End      string
-	Created  string
-	Updated  string
+	ID       int64     `json:"id"`
+	Manager  int64     `json:"manager"`
+	Employee NullInt64 `json:"employee"`
+	Break    float64   `json:"break"`
+	Start    string    `json:"startTime"`
+	End      string    `json:"endTime"`
+	Created  string    `json:"createdAt"`
+	Updated  string    `json:"updatedAt"`
 }
 
 func main() {
@@ -176,6 +191,21 @@ func main() {
 		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE start_time>'%s' AND end_time<'%s'", startParam, endParam)
 		results := getShifts(queryString)
 		c.JSON(200, results)
+	})
+
+	// create shift
+	routes.POST("/shifts", func(c *gin.Context) {
+		var shift Shift
+		c.BindJSON(&shift)
+
+		result := createShift(shift)
+
+		if err != nil {
+			c.JSON(500, gin.H{"Error": err})
+		} else {
+
+			c.JSON(201, gin.H{"success": result})
+		}
 	})
 
 	// get USERS:
