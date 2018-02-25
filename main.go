@@ -2,10 +2,8 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
-	"reflect"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -21,40 +19,6 @@ const (
 // Global DB handles
 var db *sql.DB
 var err error
-
-// NullInt64 : allow for null value in employee field for shifts
-type NullInt64 sql.NullInt64
-
-// Scan : check for null value and set Valid bool
-func (ni *NullInt64) Scan(value interface{}) error {
-	var i sql.NullInt64
-	if err := i.Scan(value); err != nil {
-		return err
-	}
-
-	// if nil then make Valid false
-	if reflect.TypeOf(value) == nil {
-		*ni = NullInt64{i.Int64, false}
-	} else {
-		*ni = NullInt64{i.Int64, true}
-	}
-	return nil
-}
-
-// MarshalJSON : allow for EITHER null or populated value in employee field for shifts
-func (ni *NullInt64) MarshalJSON() ([]byte, error) {
-	if !ni.Valid {
-		return []byte("null"), nil
-	}
-	return json.Marshal(ni.Int64)
-}
-
-// UnmarshalJSON for NullInt64
-func (ni *NullInt64) UnmarshalJSON(b []byte) error {
-	err := json.Unmarshal(b, &ni.Int64)
-	ni.Valid = (err == nil)
-	return err
-}
 
 // multiple user rows into slice of Users
 func scanUsers(rows *sql.Rows) []User {
