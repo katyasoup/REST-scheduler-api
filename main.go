@@ -116,6 +116,7 @@ func main() {
 
 	r := gin.Default()
 
+	// get all shifts
 	r.GET("/Shifts", func(c *gin.Context) {
 		rows, err := db.Query("SELECT * FROM public.shifts")
 		defer rows.Close()
@@ -131,6 +132,7 @@ func main() {
 		c.JSON(200, shiftResults)
 	})
 
+	// get all users
 	r.GET("/Users", func(c *gin.Context) {
 		rows, err := db.Query("SELECT * FROM public.users")
 		defer rows.Close()
@@ -144,10 +146,9 @@ func main() {
 			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
 		}
 		c.JSON(200, results)
-
-		c.JSON(200, "Hook up shifts query!")
 	})
 
+	// get all users with role of employee
 	r.GET("/Employees", func(c *gin.Context) {
 		rows, err := db.Query("SELECT * FROM public.users WHERE role='employee'")
 		defer rows.Close()
@@ -161,8 +162,22 @@ func main() {
 			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
 		}
 		c.JSON(200, results)
+	})
 
-		c.JSON(200, "Hook up shifts query!")
+	// get single user by id
+	r.GET("/Employees/5", func(c *gin.Context) {
+		rows, err := db.Query("SELECT * FROM public.users WHERE role='employee' AND id=5")
+		defer rows.Close()
+
+		for rows.Next() {
+			rows.Scan(&id, &name, &role, &email, &phone, &createdAt, &updatedAt)
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(id, name, role, email, phone, createdAt, updatedAt)
+			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
+		}
+		c.JSON(200, results)
 	})
 
 	r.Run()
