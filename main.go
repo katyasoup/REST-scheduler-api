@@ -18,6 +18,10 @@ const (
 	dbname = "wiw-challenge"
 )
 
+// Global DB handles
+var db *sql.DB
+var err error
+
 // NullInt64 : allow for null value in employee field for shifts
 type NullInt64 sql.NullInt64
 
@@ -52,6 +56,52 @@ func (ni *NullInt64) UnmarshalJSON(b []byte) error {
 	return err
 }
 
+// multiple user rows into slice of Users
+func scanUsers(rows *sql.Rows) []User {
+	var users []User
+	var u User
+	for rows.Next() {
+		rows.Scan(&u.ID, &u.Name, &u.Role, &u.Email, &u.Phone, &u.Created, &u.Updated)
+		fmt.Println(u)
+		users = append(users, u)
+	}
+	return users
+}
+
+func getUsers(queryString string) []User {
+	rows, err := db.Query(queryString)
+	defer rows.Close()
+	results := scanUsers(rows)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows.Close()
+	return results
+}
+
+// multiple shift rows into slice of Shifts
+func scanShifts(rows *sql.Rows) []Shift {
+	var shifts []Shift
+	var s Shift
+	for rows.Next() {
+		rows.Scan(&s.ID, &s.Manager, &s.Employee, &s.Break, &s.Start, &s.End, &s.Created, &s.Updated)
+		fmt.Println(s)
+		shifts = append(shifts, s)
+	}
+	return shifts
+}
+
+func getShifts(queryString string) []Shift {
+	rows, err := db.Query(queryString)
+	defer rows.Close()
+	results := scanShifts(rows)
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows.Close()
+	return results
+}
+
 // User : for retrieval of user rows from db
 type User struct {
 	ID      int32
@@ -80,7 +130,7 @@ func main() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"dbname=%s sslmode=disable",
 		host, port, user, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
+	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
 	}
@@ -91,94 +141,37 @@ func main() {
 	}
 	fmt.Println("Successfully connected to the database!!!")
 
-	var (
-		shiftID        int32
-		managerID      int32
-		employeeID     NullInt64
-		breakTime      float32
-		shiftStart     string
-		shiftEnd       string
-		shiftCreatedAt string
-		shiftUpdatedAt string
-		shiftResults   []Shift
-	)
-
-	var (
-		id        int32
-		name      string
-		role      string
-		email     string
-		phone     string
-		createdAt string
-		updatedAt string
-		results   []User
-	)
-
-	r := gin.Default()
+	routes := gin.Default()
 
 	// get all shifts
-	r.GET("/Shifts", func(c *gin.Context) {
-		rows, err := db.Query("SELECT * FROM public.shifts")
-		defer rows.Close()
-
-		for rows.Next() {
-			rows.Scan(&shiftID, &managerID, &employeeID, &breakTime, &shiftStart, &shiftEnd, &shiftCreatedAt, &shiftUpdatedAt)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(shiftID, managerID, employeeID, breakTime, shiftStart, shiftEnd, shiftCreatedAt, shiftUpdatedAt)
-			shiftResults = append(shiftResults, Shift{shiftID, managerID, employeeID, breakTime, shiftStart, shiftEnd, shiftCreatedAt, shiftUpdatedAt})
-		}
-		c.JSON(200, shiftResults)
+	routes.GET("/Shifts", func(c *gin.Context) {
+		results := getShifts("SELECT * FROM public.shifts")
+		c.JSON(200, results)
 	})
 
 	// get all users
-	r.GET("/Users", func(c *gin.Context) {
-		rows, err := db.Query("SELECT * FROM public.users")
-		defer rows.Close()
-
-		for rows.Next() {
-			rows.Scan(&id, &name, &role, &email, &phone, &createdAt, &updatedAt)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(id, name, role, email, phone, createdAt, updatedAt)
-			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
-		}
+	routes.GET("/Users", func(c *gin.Context) {
+		results := getUsers("SELECT * FROM public.users")
 		c.JSON(200, results)
 	})
 
 	// get all users with role of employee
-	r.GET("/Employees", func(c *gin.Context) {
-		rows, err := db.Query("SELECT * FROM public.users WHERE role='employee'")
-		defer rows.Close()
-
-		for rows.Next() {
-			rows.Scan(&id, &name, &role, &email, &phone, &createdAt, &updatedAt)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(id, name, role, email, phone, createdAt, updatedAt)
-			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
-		}
+	routes.GET("/Employees", func(c *gin.Context) {
+		results := getUsers("SELECT * FROM public.users WHERE role='employee'")
 		c.JSON(200, results)
 	})
 
-	// get single user by id
-	r.GET("/Employees/5", func(c *gin.Context) {
-		rows, err := db.Query("SELECT * FROM public.users WHERE role='employee' AND id=5")
-		defer rows.Close()
+	// get single EMPLOYEE by id
+	routes.GET("/Employees/:id", func(c *gin.Context) {
+		var u User
+		idParam := c.Params.ByName("id")
+		queryString := fmt.Sprintf("SELECT * FROM public.users WHERE role='employee' AND id=%s", idParam)
+		row := db.QueryRow(queryString)
 
-		for rows.Next() {
-			rows.Scan(&id, &name, &role, &email, &phone, &createdAt, &updatedAt)
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Println(id, name, role, email, phone, createdAt, updatedAt)
-			results = append(results, User{id, name, role, email, phone, createdAt, updatedAt})
-		}
-		c.JSON(200, results)
+		row.Scan(&u.ID, &u.Name, &u.Role, &u.Email, &u.Phone, &u.Created, &u.Updated)
+		fmt.Println(u)
+		c.JSON(200, u)
 	})
 
-	r.Run()
+	routes.Run()
 }
