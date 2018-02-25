@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -104,6 +105,14 @@ func getShift(queryString string) Shift {
 	return results
 }
 
+func getAllShifts() []Shift {
+	return getShifts("SELECT * FROM public.shifts")
+}
+
+func getShiftByID(id int64) Shift {
+	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE id=%d", id))[0]
+}
+
 //
 func createShift(shift Shift) Shift {
 	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES(%d, %f, '%s', '%s');",
@@ -142,6 +151,14 @@ type Shift struct {
 	Updated  string    `json:"updatedAt"`
 }
 
+func stringToInt64(str string) int64 {
+	id, err := strconv.ParseInt(str, 0, 64)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 func main() {
 	// db setup
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
@@ -164,15 +181,14 @@ func main() {
 
 	// get all shifts
 	routes.GET("/shifts", func(c *gin.Context) {
-		results := getShifts("SELECT * FROM public.shifts")
+		results := getAllShifts()
 		c.JSON(200, results)
 	})
 
 	// get single shift by id
 	routes.GET("/shifts/:id", func(c *gin.Context) {
-		idParam := c.Params.ByName("id")
-		queryString := fmt.Sprintf("SELECT * FROM public.shifts WHERE id=%s", idParam)
-		result := getShift(queryString)
+		id := stringToInt64(c.Param("id"))
+		result := getShiftByID(id)
 		c.JSON(200, result)
 	})
 
