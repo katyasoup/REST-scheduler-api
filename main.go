@@ -159,6 +159,19 @@ func createShift(shift Shift) Shift {
 	return shift
 }
 
+func scheduleEmployee(shift Shift) Shift {
+	queryString := fmt.Sprintf("UPDATE shifts SET employee_id =%d, updated_at=now() WHERE id = %d;",
+		shift.Employee.Int64, shift.ID)
+	fmt.Println(queryString)
+	rows, err := db.Query(queryString)
+	defer rows.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows.Close()
+	return shift
+}
+
 // User : for storing retrieval of user rows from db
 type User struct {
 	ID      int64
@@ -243,6 +256,18 @@ func main() {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := createShift(shift)
+		if err != nil {
+			c.JSON(500, gin.H{"Error": err})
+		} else {
+			c.JSON(201, gin.H{"success": result})
+		}
+	})
+
+	// add employee to shift
+	routes.PUT("/shifts", func(c *gin.Context) {
+		var shift Shift
+		c.BindJSON(&shift)
+		result := scheduleEmployee(shift)
 		if err != nil {
 			c.JSON(500, gin.H{"Error": err})
 		} else {
