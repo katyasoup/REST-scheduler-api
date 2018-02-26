@@ -6,6 +6,44 @@ import (
 	"reflect"
 )
 
+// User : maps to row from users table
+type User struct {
+	ID      int64
+	Name    string
+	Role    string
+	Email   string
+	Phone   string
+	Created string
+	Updated string
+}
+
+// Shift : maps to row from shifts table
+type Shift struct {
+	ID       int64     `json:"id"`
+	Manager  int64     `json:"manager"`
+	Employee NullInt64 `json:"employee"`
+	Break    float64   `json:"break"`
+	Start    string    `json:"startTime"`
+	End      string    `json:"endTime"`
+	Created  string    `json:"createdAt"`
+	Updated  string    `json:"updatedAt"`
+}
+
+// Roster : maps to row from join on shifts and users table
+type Roster struct {
+	ID       int64
+	Manager  int64
+	Employee NullInt64
+	Break    NullFloat64
+	Start    string
+	End      string
+	Created  string
+	Updated  string
+	Name     string
+	Email    NullString
+	Phone    NullString
+}
+
 // NullInt64 : allow for null value in employee field for shifts
 type NullInt64 sql.NullInt64
 
