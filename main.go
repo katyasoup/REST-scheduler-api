@@ -156,7 +156,8 @@ func createShift(shift Shift) Shift {
 		log.Fatal(err)
 	}
 	rows.Close()
-	return shift
+	// ideally will return most recently created shift; below code doesn't quite work
+	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE id=MAX"))
 }
 
 func scheduleEmployee(shift Shift) Shift {
@@ -169,7 +170,22 @@ func scheduleEmployee(shift Shift) Shift {
 		log.Fatal(err)
 	}
 	rows.Close()
-	return shift
+	// ideally will return most recently updated shift; below code doesn't quite work
+	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE updated_at=MAX"))
+}
+
+func editShiftTime(shift Shift) Shift {
+	queryString := fmt.Sprintf("UPDATE shifts SET start_time='%s', end_time='%s', updated_at=now() WHERE id=%d;",
+		shift.Start, shift.End, shift.ID)
+	fmt.Println(queryString)
+	rows, err := db.Query(queryString)
+	defer rows.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	rows.Close()
+	// ideally will return most recently updated shift; below code doesn't quite work
+	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE updated_at=MAX"))
 }
 
 // User : for storing retrieval of user rows from db
@@ -263,8 +279,20 @@ func main() {
 		}
 	})
 
-	// add employee to shift
+	// change shift time
 	routes.PUT("/shifts", func(c *gin.Context) {
+		var shift Shift
+		c.BindJSON(&shift)
+		result := editShiftTime(shift)
+		if err != nil {
+			c.JSON(500, gin.H{"Error": err})
+		} else {
+			c.JSON(201, gin.H{"success": result})
+		}
+	})
+
+	// add employee to shift
+	routes.PUT("/shifts/assign", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := scheduleEmployee(shift)
