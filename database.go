@@ -100,6 +100,10 @@ func getManagerByID(id int64) User {
 	return getUser(fmt.Sprintf("SELECT * FROM public.users WHERE role='manager' AND id=%d", id))
 }
 
+func getMyManagers(id int64) []Roster {
+	return getRoster(fmt.Sprintf("SELECT shifts.* AS shift, users.name, users.email, users.phone FROM shifts FULL JOIN users ON shifts.manager_id=users.id WHERE employee_id=%d", id))
+}
+
 // map multiple shift rows into slice of Shifts
 func scanShifts(rows *sql.Rows) []Shift {
 	var shifts []Shift

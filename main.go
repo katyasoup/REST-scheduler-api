@@ -162,5 +162,12 @@ func main() {
 		c.JSON(200, results)
 	})
 
+	// get all shifts for single employee with manager contact info
+	routes.GET("/mymanagers/:id", func(c *gin.Context) {
+		id := stringToInt64(c.Param("id"))
+		results := getMyManagers(id)
+		c.JSON(200, results)
+	})
+
 	routes.Run()
 }
