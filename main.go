@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 	// "time"
 
 	"github.com/gin-gonic/gin"
@@ -175,25 +176,29 @@ func main() {
 		c.JSON(200, results)
 	})
 
-	// // get all shifts for single employee by date range
-	// routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
-	// 	id := stringToInt64(c.Param("id"))
-	// 	start := c.Params.ByName("start")
-	// 	end := c.Params.ByName("end")
-	// 	results := getMyHours(id, start, end)
+	// get all shifts for single employee by date range
+	routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
+		id := stringToInt64(c.Param("id"))
+		start := c.Params.ByName("start")
+		end := c.Params.ByName("end")
+		results := getMyHours(id, start, end)
+		var totalHours int
 
-	// 	for _, shift := range results {
+		for _, shift := range results {
+			start, err := time.Parse(time.RFC3339, shift.Start)
+			end, err := time.Parse(time.RFC3339, shift.End)
+			if err != nil {
+				panic(err)
+			}
+			shiftHours := end.Hour() - start.Hour()
+			fmt.Printf("Shift length: %d ", shiftHours)
 
-	// 		t, err := time.Parse(time.UnixDate, shift.Start)
-	// 		if err != nil {
-	// 			panic(err)
-	// 		}
-	// 		fmt.Printf("Shift start: %s", t.Format(shift.Start))
-	// 		fmt.Printf("Shift end: %s", t.Format(shift.End))
-
-	// 	}
-
-	// 	c.JSON(200, results)
-	// })
+			// add hours for each shift in date range to total hours
+			totalHours += shiftHours
+			fmt.Printf("Total hours: %d ", totalHours)
+		}
+		summary := Hours{results, totalHours}
+		c.JSON(200, summary)
+	})
 	routes.Run()
 }
