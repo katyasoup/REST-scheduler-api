@@ -190,6 +190,10 @@ func getCoworkers(start string, end string) []Roster {
 	return getRoster(fmt.Sprintf("SELECT shifts.* AS shift, users.name, users.email, users.phone FROM shifts FULL JOIN users ON shifts.employee_id=users.id WHERE end_time > '%s' AND start_time < '%s'", start, end))
 }
 
+// func getMyHours(id int64, start string, end string) []Shift {
+// 	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%d AND start_time >='%s' AND end_time < '%s'", id, start, end))
+// }
+
 //
 func createShift(shift Shift) Shift {
 	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES(%d, %f, '%s', '%s');",
