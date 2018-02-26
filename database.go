@@ -17,23 +17,6 @@ const (
 var db *sql.DB
 var err error
 
-// db setup
-// func OpenDatabase() {
-// 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-// 		"dbname=%s sslmode=disable",
-// 		host, port, user, dbname)
-// 	db, err = sql.Open("postgres", psqlInfo)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	defer db.Close()
-// 	err = db.Ping()
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	fmt.Println("Successfully connected to the database!!!")
-// }
-
 // map multiple user rows into slice of Users
 func scanUsers(rows *sql.Rows) []User {
 	var users []User
@@ -194,43 +177,29 @@ func getMyHours(id int64, start string, end string) []Shift {
 	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%d AND start_time >='%s' AND end_time < '%s'", id, start, end))
 }
 
-//
-func createShift(shift Shift) Shift {
-	queryString := fmt.Sprintf("INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES(%d, %f, '%s', '%s');",
-		shift.Manager, shift.Break, shift.Start, shift.End)
+// consolidate methods for PUT and POST routes
+func execute(queryString string, args ...interface{}) {
 	fmt.Println(queryString)
-	rows, err := db.Query(queryString)
-	defer rows.Close()
+	_, err := db.Exec(queryString, args...)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rows.Close()
-	// ideally will return most recently created shift; below code doesn't quite work
+}
+
+func createShift(shift Shift) Shift {
+	queryString := "INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES($1, $2, $3, $4);"
+	execute(queryString, shift.Manager, shift.Break, shift.Start, shift.End)
 	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE id=MAX"))
 }
 
 func scheduleEmployee(shift Shift) Shift {
-	queryString := fmt.Sprintf("UPDATE shifts SET employee_id=%d, updated_at=now() WHERE id=%d;",
-		shift.Employee.Int64, shift.ID)
-	fmt.Println(queryString)
-	rows, err := db.Query(queryString)
-	defer rows.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	rows.Close()
+	queryString := "UPDATE shifts SET employee_id=$1, updated_at=now() WHERE id=$2;"
+	execute(queryString, shift.Employee.Int64, shift.ID)
 	return getShiftByID(shift.ID)
 }
 
 func editShiftTime(shift Shift) Shift {
-	queryString := fmt.Sprintf("UPDATE shifts SET start_time='%s', end_time='%s', updated_at=now() WHERE id=%d;",
-		shift.Start, shift.End, shift.ID)
-	fmt.Println(queryString)
-	rows, err := db.Query(queryString)
-	defer rows.Close()
-	if err != nil {
-		log.Fatal(err)
-	}
-	rows.Close()
+	queryString := "UPDATE shifts SET start_time=$1, end_time=$2, updated_at=now() WHERE id=$3;"
+	execute(queryString, shift.Start, shift.End, shift.ID)
 	return getShiftByID(shift.ID)
 }

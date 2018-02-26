@@ -12,17 +12,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// const (
-// 	host   = "localhost"
-// 	port   = 5432
-// 	user   = "Katie"
-// 	dbname = "wiw-challenge"
-// )
-
-// // Global DB handles
-// var db *sql.DB
-// var err error
-
 func stringToInt64(str string) int64 {
 	id, err := strconv.ParseInt(str, 0, 64)
 	if err != nil {
@@ -177,6 +166,7 @@ func main() {
 	})
 
 	// get all shifts for single employee by date range
+	// // TODO: add math for subtracting break time from total hours
 	routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
 		id := stringToInt64(c.Param("id"))
 		start := c.Params.ByName("start")
