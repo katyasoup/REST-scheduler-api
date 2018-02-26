@@ -9,16 +9,16 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	host   = "localhost"
-	port   = 5432
-	user   = "Katie"
-	dbname = "wiw-challenge"
-)
+// const (
+// 	host   = "localhost"
+// 	port   = 5432
+// 	user   = "Katie"
+// 	dbname = "wiw-challenge"
+// )
 
-// Global DB handles
-var db *sql.DB
-var err error
+// // Global DB handles
+// var db *sql.DB
+// var err error
 
 func stringToInt64(str string) int64 {
 	id, err := strconv.ParseInt(str, 0, 64)
@@ -29,7 +29,8 @@ func stringToInt64(str string) int64 {
 }
 
 func main() {
-	// db setup
+
+	// OpenDatabase()
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"dbname=%s sslmode=disable",
 		host, port, user, dbname)

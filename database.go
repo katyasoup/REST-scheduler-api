@@ -6,6 +6,34 @@ import (
 	"log"
 )
 
+const (
+	host   = "localhost"
+	port   = 5432
+	user   = "Katie"
+	dbname = "wiw-challenge"
+)
+
+// Global DB handles
+var db *sql.DB
+var err error
+
+// db setup
+// func OpenDatabase() {
+// 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+// 		"dbname=%s sslmode=disable",
+// 		host, port, user, dbname)
+// 	db, err = sql.Open("postgres", psqlInfo)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	defer db.Close()
+// 	err = db.Ping()
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	fmt.Println("Successfully connected to the database!!!")
+// }
+
 // map multiple user rows into slice of Users
 func scanUsers(rows *sql.Rows) []User {
 	var users []User
