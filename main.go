@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"strconv"
 	// "time"
 
@@ -48,12 +49,16 @@ func main() {
 
 	routes := gin.Default()
 
+	manager := routes.Group("/", gin.BasicAuth(gin.Accounts{
+		"manager": "password",
+	}))
+
 	// SHIFT routes:
 
 	// get all shifts
 	routes.GET("/shifts", func(c *gin.Context) {
 		results := getAllShifts()
-		c.JSON(200, results)
+		c.JSON(http.StatusOK, results)
 	})
 
 	// get single shift by id
@@ -79,7 +84,7 @@ func main() {
 	})
 
 	// add new shift
-	routes.POST("/shifts", func(c *gin.Context) {
+	manager.POST("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := createShift(shift)
@@ -91,7 +96,7 @@ func main() {
 	})
 
 	// change shift time
-	routes.PUT("/shifts", func(c *gin.Context) {
+	manager.PUT("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := editShiftTime(shift)
@@ -103,7 +108,7 @@ func main() {
 	})
 
 	// add employee to shift
-	routes.PUT("/shifts/assign", func(c *gin.Context) {
+	manager.PUT("/shifts/assign", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := scheduleEmployee(shift)
@@ -180,7 +185,7 @@ func main() {
 	// 	for _, shift := range results {
 
 	// 		t, err := time.Parse(time.UnixDate, shift.Start)
-	// 		if err != nil { 
+	// 		if err != nil {
 	// 			panic(err)
 	// 		}
 	// 		fmt.Printf("Shift start: %s", t.Format(shift.Start))
