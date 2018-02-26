@@ -3,7 +3,9 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"net/http"
 	"strconv"
+	"time"
 	// "time"
 
 	"github.com/gin-gonic/gin"
@@ -48,12 +50,16 @@ func main() {
 
 	routes := gin.Default()
 
+	manager := routes.Group("/", gin.BasicAuth(gin.Accounts{
+		"manager": "password",
+	}))
+
 	// SHIFT routes:
 
 	// get all shifts
 	routes.GET("/shifts", func(c *gin.Context) {
 		results := getAllShifts()
-		c.JSON(200, results)
+		c.JSON(http.StatusOK, results)
 	})
 
 	// get single shift by id
@@ -79,7 +85,7 @@ func main() {
 	})
 
 	// add new shift
-	routes.POST("/shifts", func(c *gin.Context) {
+	manager.POST("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := createShift(shift)
@@ -91,7 +97,7 @@ func main() {
 	})
 
 	// change shift time
-	routes.PUT("/shifts", func(c *gin.Context) {
+	manager.PUT("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := editShiftTime(shift)
@@ -103,7 +109,7 @@ func main() {
 	})
 
 	// add employee to shift
-	routes.PUT("/shifts/assign", func(c *gin.Context) {
+	manager.PUT("/shifts/assign", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := scheduleEmployee(shift)
@@ -170,25 +176,29 @@ func main() {
 		c.JSON(200, results)
 	})
 
-	// // get all shifts for single employee by date range
-	// routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
-	// 	id := stringToInt64(c.Param("id"))
-	// 	start := c.Params.ByName("start")
-	// 	end := c.Params.ByName("end")
-	// 	results := getMyHours(id, start, end)
+	// get all shifts for single employee by date range
+	routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
+		id := stringToInt64(c.Param("id"))
+		start := c.Params.ByName("start")
+		end := c.Params.ByName("end")
+		results := getMyHours(id, start, end)
+		var totalHours int
 
-	// 	for _, shift := range results {
+		for _, shift := range results {
+			start, err := time.Parse(time.RFC3339, shift.Start)
+			end, err := time.Parse(time.RFC3339, shift.End)
+			if err != nil {
+				panic(err)
+			}
+			shiftHours := end.Hour() - start.Hour()
+			fmt.Printf("Shift length: %d ", shiftHours)
 
-	// 		t, err := time.Parse(time.UnixDate, shift.Start)
-	// 		if err != nil { 
-	// 			panic(err)
-	// 		}
-	// 		fmt.Printf("Shift start: %s", t.Format(shift.Start))
-	// 		fmt.Printf("Shift end: %s", t.Format(shift.End))
-
-	// 	}
-
-	// 	c.JSON(200, results)
-	// })
+			// add hours for each shift in date range to total hours
+			totalHours += shiftHours
+			fmt.Printf("Total hours: %d ", totalHours)
+		}
+		summary := Hours{results, totalHours}
+		c.JSON(200, summary)
+	})
 	routes.Run()
 }

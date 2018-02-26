@@ -44,6 +44,12 @@ type Roster struct {
 	Phone    NullString
 }
 
+// Hours : holds summary data from getHours route
+type Hours struct {
+	Shifts     []Shift
+	TotalHours int
+}
+
 // NullInt64 : allow for null value in employee field for shifts
 type NullInt64 sql.NullInt64
 

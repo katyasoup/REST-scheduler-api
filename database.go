@@ -190,9 +190,9 @@ func getCoworkers(start string, end string) []Roster {
 	return getRoster(fmt.Sprintf("SELECT shifts.* AS shift, users.name, users.email, users.phone FROM shifts FULL JOIN users ON shifts.employee_id=users.id WHERE end_time > '%s' AND start_time < '%s'", start, end))
 }
 
-// func getMyHours(id int64, start string, end string) []Shift {
-// 	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%d AND start_time >='%s' AND end_time < '%s'", id, start, end))
-// }
+func getMyHours(id int64, start string, end string) []Shift {
+	return getShifts(fmt.Sprintf("SELECT * FROM public.shifts WHERE employee_id=%d AND start_time >='%s' AND end_time < '%s'", id, start, end))
+}
 
 //
 func createShift(shift Shift) Shift {
@@ -210,7 +210,7 @@ func createShift(shift Shift) Shift {
 }
 
 func scheduleEmployee(shift Shift) Shift {
-	queryString := fmt.Sprintf("UPDATE shifts SET employee_id =%d, updated_at=now() WHERE id = %d;",
+	queryString := fmt.Sprintf("UPDATE shifts SET employee_id=%d, updated_at=now() WHERE id=%d;",
 		shift.Employee.Int64, shift.ID)
 	fmt.Println(queryString)
 	rows, err := db.Query(queryString)
@@ -219,8 +219,7 @@ func scheduleEmployee(shift Shift) Shift {
 		log.Fatal(err)
 	}
 	rows.Close()
-	// ideally will return most recently updated shift; below code doesn't quite work
-	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE updated_at=MAX"))
+	return getShiftByID(shift.ID)
 }
 
 func editShiftTime(shift Shift) Shift {
@@ -233,6 +232,5 @@ func editShiftTime(shift Shift) Shift {
 		log.Fatal(err)
 	}
 	rows.Close()
-	// ideally will return most recently updated shift; below code doesn't quite work
-	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE updated_at=MAX"))
+	return getShiftByID(shift.ID)
 }
