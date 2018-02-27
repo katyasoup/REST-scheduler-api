@@ -33,7 +33,7 @@ func main() {
 	// As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me:
 	routes.GET("/myshifts/:id", func(c *gin.Context) {
 		id := stringToInt64(c.Param("id"))
-		results := getAllShiftsByEmployee(id)
+		results := getShiftsByEmployee(id)
 		c.JSON(200, results)
 	})
 
@@ -60,7 +60,7 @@ func main() {
 		id := stringToInt64(c.Param("id"))
 		start := c.Params.ByName("start")
 		end := c.Params.ByName("end")
-		results := getEmployeeShiftsWithHours(id, start, end)
+		results := getShiftsByEmployeeInDateRange(id, start, end)
 		var totalHours int
 
 		for _, shift := range results {

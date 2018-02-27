@@ -122,7 +122,7 @@ func multipleRowsToRoster(rows *sql.Rows) []Roster {
 // // EMPLOYEE user stories:
 
 // As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me:
-func getAllShiftsByEmployee(id int64) []Shift {
+func getShiftsByEmployee(id int64) []Shift {
 	shiftRows := selectMany("SELECT * FROM shifts WHERE employee_id=$1", id)
 	return multipleRowsToShifts(shiftRows)
 }
@@ -140,7 +140,7 @@ func getManagerRostersByDateRange(id int64) []Roster {
 }
 
 // As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week:
-func getEmployeeShiftsWithHours(id int64, start string, end string) []Shift {
+func getShiftsByEmployeeInDateRange(id int64, start string, end string) []Shift {
 	shiftRows := selectMany("SELECT * FROM shifts WHERE employee_id=$1 AND start_time > $2 AND end_time < $3", id, start, end)
 	return multipleRowsToShifts(shiftRows)
 }
