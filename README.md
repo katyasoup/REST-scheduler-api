@@ -64,7 +64,7 @@ ex. PUT: (edit times)
 }
 ```
 
-###User Stories
+### User Stories
 
 - [x] As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me.
 	- GET: ``` /myshifts/:empID```
@@ -77,21 +77,21 @@ ex. PUT: (edit times)
 	- ex. [http://localhost:8080/hours/4/2018-03-01T09:00:00Z/2018-03-07T17:00:00Z](http://localhost:8080/hours/4/2018-03-01T09:00:00Z/2018-03-07T17:00:00Z)
 - [x] As an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts.
 	- GET: ```/mymanagers/:empID```
-	- - ex. [http://localhost:8080/mymanagers/1](http://localhost:8080/mymanagers/1)
+	- ex. [http://localhost:8080/mymanagers/1](http://localhost:8080/mymanagers/1)
 - [x] As a manager, I want to schedule my employees, by creating shifts for any employee.
 	- 	POST: ```/shifts```
 	-  To see currently unassigned shifts: [http://localhost:8080/shifts/unassigned](http://localhost:8080/shifts/unassigned)
 - [x] As a manager, I want to see the schedule, by listing shifts within a specific time period.
 	- GET: ```/schedule/:start/:end```
-	- - ex. [http://localhost:8080/schedule/2018-03-01T09:00:00Z/2018-03-04T17:00:00Z](http://localhost:8080/schedule/2018-03-01T09:00:00Z/2018-03-04T17:00:00Z)
+	- ex. [http://localhost:8080/schedule/2018-03-01T09:00:00Z/2018-03-04T17:00:00Z](http://localhost:8080/schedule/2018-03-01T09:00:00Z/2018-03-04T17:00:00Z)
 - [x] As a manager, I want to be able to change a shift, by updating the time details.
 	- 	PUT: ```/shifts```
 - [x] As a manager, I want to be able to assign a shift, by changing the employee that will work a shift.
 	- 	PUT: ```/shifts/assign```
 - [x] As a manager, I want to contact an employee, by seeing employee details.
 	- GET: ```/employees``` or ```/employees/:id```
-	- - ex. [http://localhost8080/employees](http://localhost:8080/employees)
-	- - ex. [http://localhost8080/employees/1](http://localhost:8080/employees/1)
+	- ex. [http://localhost8080/employees](http://localhost:8080/employees)
+	- ex. [http://localhost8080/employees/1](http://localhost:8080/employees/1)
 	
 ## Known Limitations & Next Steps
 
