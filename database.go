@@ -9,7 +9,7 @@ import (
 const (
 	host   = "localhost"
 	port   = 5432
-	user   = "postgres"
+	user   = "Katie"
 	dbname = "wiw-challenge"
 )
 
@@ -19,9 +19,9 @@ var err error
 
 // OpenDatabase : opens connection to database
 func OpenDatabase() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s "+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
 		"dbname=%s sslmode=disable",
-		host, port, user, "yourPassword", dbname)
+		host, port, user, dbname)
 	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
@@ -111,7 +111,7 @@ func multipleRowsToRoster(rows *sql.Rows) []Roster {
 	var roster []Roster
 	var r Roster
 	for rows.Next() {
-		rows.Scan(&r.ID, &r.Manager, &r.Employee, &r.Break, &r.Start, &r.End, &r.Created, &r.Updated, &r.Name, &r.Phone, &r.Email)
+		rows.Scan(&r.ID, &r.Manager, &r.Employee, &r.Break, &r.Start, &r.End, &r.Created, &r.Updated, &r.Name, &r.Email, &r.Phone)
 		fmt.Println(r)
 		roster = append(roster, r)
 	}
