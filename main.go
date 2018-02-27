@@ -28,6 +28,9 @@ func main() {
 		"manager": "password",
 	}))
 
+	routes.GET("/", func(c *gin.Context) {
+		c.JSON(200, "Hey there, thanks for checking out my project! -Katie")
+	})
 	// // EMPLOYEE user stories:
 
 	// As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me:
