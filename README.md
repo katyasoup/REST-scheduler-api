@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 [PostgresSQL v9.6](https://www.postgresql.org/download/)  
 
 #### Recommended
-[Postico] (https://eggerapps.at/postico/) or other PostgreSQL management tool of your choice  
+[Postico](https://eggerapps.at/postico/) or other PostgreSQL management tool of your choice  
 [Restlet Client](https://chrome.google.com/webstore/detail/restlet-client-rest-api-t/aejoelaoggembcahagimdiliamlcdmfm), [Postman](https://www.getpostman.com/) or other REST client of your choice
 
 ### Install
