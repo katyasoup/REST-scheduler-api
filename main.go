@@ -1,12 +1,9 @@
 package main
 
 import (
-	"database/sql"
 	"fmt"
-	"net/http"
 	"strconv"
 	"time"
-	// "time"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -22,34 +19,14 @@ func stringToInt64(str string) int64 {
 
 func main() {
 
-	// OpenDatabase()
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"dbname=%s sslmode=disable",
-		host, port, user, dbname)
-	db, err = sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Successfully connected to the database!!!")
+	OpenDatabase()
+	defer CloseDatabase()
 
 	routes := gin.Default()
 
 	manager := routes.Group("/", gin.BasicAuth(gin.Accounts{
 		"manager": "password",
 	}))
-
-	// SHIFT routes:
-
-	// get all shifts
-	routes.GET("/shifts", func(c *gin.Context) {
-		results := getAllShifts()
-		c.JSON(http.StatusOK, results)
-	})
 
 	// get single shift by id
 	routes.GET("/shifts/:id", func(c *gin.Context) {
@@ -109,22 +86,6 @@ func main() {
 		}
 	})
 
-	// USER routes:
-
-	// get all users
-	routes.GET("/users", func(c *gin.Context) {
-		results := getAllUsers()
-		c.JSON(200, results)
-	})
-
-	// get single user by id
-	routes.GET("/users/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
-		result := getUserByID(id)
-		c.JSON(200, result)
-	})
-
-	// get all users with role of employee
 	routes.GET("/employees", func(c *gin.Context) {
 		results := getAllEmployees()
 		c.JSON(200, results)
@@ -134,19 +95,6 @@ func main() {
 	routes.GET("/employees/:id", func(c *gin.Context) {
 		id := stringToInt64(c.Param("id"))
 		result := getEmployeeByID(id)
-		c.JSON(200, result)
-	})
-
-	// get all users with role of manager
-	routes.GET("/managers", func(c *gin.Context) {
-		results := getAllManagers()
-		c.JSON(200, results)
-	})
-
-	// get single manager by id
-	routes.GET("/managers/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
-		result := getManagerByID(id)
 		c.JSON(200, result)
 	})
 
@@ -192,3 +140,38 @@ func main() {
 	})
 	routes.Run()
 }
+
+// Routes not explicitly needed for user stories:
+
+// get all users
+// routes.GET("/users", func(c *gin.Context) {
+// 	results := getAllUsers()
+// 	c.JSON(200, results)
+// })
+
+// get single user by id
+// routes.GET("/users/:id", func(c *gin.Context) {
+// 	id := stringToInt64(c.Param("id"))
+// 	result := getUserByID(id)
+// 	c.JSON(200, result)
+// })
+
+// get all shifts
+// routes.GET("/shifts", func(c *gin.Context) {
+// 	results := getAllShifts()
+// 	c.JSON(http.StatusOK, results)
+// })
+
+// get all users with role of manager
+// routes.GET("/managers", func(c *gin.Context) {
+// 	results := getAllManagers()
+// 	c.JSON(200, results)
+// })
+
+// get single manager by id
+// routes.GET("/managers/:id", func(c *gin.Context) {
+// 	id := stringToInt64(c.Param("id"))
+// 	result := getManagerByID(id)
+// 	c.JSON(200, result)
+// })
+// get all users with role of employee
