@@ -28,98 +28,39 @@ func main() {
 		"manager": "password",
 	}))
 
-	// get single shift by id
-	routes.GET("/shifts/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
-		result := getShiftByID(id)
-		c.JSON(200, result)
-	})
+	// // EMPLOYEE user stories:
 
-	// get all shifts for single employee
+	// As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me:
 	routes.GET("/myshifts/:id", func(c *gin.Context) {
 		id := stringToInt64(c.Param("id"))
-		results := getMyShifts(id)
+		results := getAllShiftsByEmployee(id)
 		c.JSON(200, results)
 	})
 
-	// get all shifts for date range
-	routes.GET("/schedule/:start/:end", func(c *gin.Context) {
-		start := c.Params.ByName("start")
-		end := c.Params.ByName("end")
-		results := getSchedule(start, end)
-		c.JSON(200, results)
-	})
-
-	// add new shift
-	manager.POST("/shifts", func(c *gin.Context) {
-		var shift Shift
-		c.BindJSON(&shift)
-		result := createShift(shift)
-		if err != nil {
-			c.JSON(500, gin.H{"Error": err})
-		} else {
-			c.JSON(201, gin.H{"success": result})
-		}
-	})
-
-	// change shift time
-	manager.PUT("/shifts", func(c *gin.Context) {
-		var shift Shift
-		c.BindJSON(&shift)
-		result := editShiftTime(shift)
-		if err != nil {
-			c.JSON(500, gin.H{"Error": err})
-		} else {
-			c.JSON(201, gin.H{"success": result})
-		}
-	})
-
-	// add employee to shift
-	manager.PUT("/shifts/assign", func(c *gin.Context) {
-		var shift Shift
-		c.BindJSON(&shift)
-		result := scheduleEmployee(shift)
-		if err != nil {
-			c.JSON(500, gin.H{"Error": err})
-		} else {
-			c.JSON(201, gin.H{"success": result})
-		}
-	})
-
-	routes.GET("/employees", func(c *gin.Context) {
-		results := getAllEmployees()
-		c.JSON(200, results)
-	})
-
-	// get single employee by id
-	routes.GET("/employees/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
-		result := getEmployeeByID(id)
-		c.JSON(200, result)
-	})
-
-	// get coworkers for date range
+	// As an employee, I want to know who I am working with, by being able to see the
+	// employees that are working during the same time period as me:
 	routes.GET("/roster/:start/:end", func(c *gin.Context) {
 		start := c.Params.ByName("start")
 		end := c.Params.ByName("end")
-		results := getCoworkers(start, end)
+		results := getEmployeeRostersByDateRange(start, end)
 		c.JSON(200, results)
 	})
 
-	// get all shifts for single employee with manager contact info
+	// As an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts:
 	routes.GET("/mymanagers/:id", func(c *gin.Context) {
 		id := stringToInt64(c.Param("id"))
-		results := getMyManagers(id)
+		results := getManagerRostersByDateRange(id)
 		c.JSON(200, results)
 	})
 
-	// get all shifts for single employee by date range
+	// As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week:
 	// // TODO: add math for subtracting break time from total hours
+	// // TODO: only total hours for dates in past
 	routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
 		id := stringToInt64(c.Param("id"))
 		start := c.Params.ByName("start")
 		end := c.Params.ByName("end")
-		results := getMyHours(id, start, end)
+		results := getEmployeeShiftsWithHours(id, start, end)
 		var totalHours int
 
 		for _, shift := range results {
@@ -138,40 +79,67 @@ func main() {
 		summary := Hours{results, totalHours}
 		c.JSON(200, summary)
 	})
+
+	// // MANAGER user stories:
+
+	// As a manager, I want to see the schedule, by listing shifts within a specific time period:
+	// // NOTE route listed as "/schedule/:start/:end" because "/shifts/:start/:end" conflicts with "/shifts/:id"
+	routes.GET("/schedule/:start/:end", func(c *gin.Context) {
+		start := c.Params.ByName("start")
+		end := c.Params.ByName("end")
+		results := getShiftsByDateRange(start, end)
+		c.JSON(200, results)
+	})
+
+	// As a manager, I want to schedule my employees, by creating shifts for any employee:
+	manager.POST("/shifts", func(c *gin.Context) {
+		var shift Shift
+		c.BindJSON(&shift)
+		result := createShift(shift)
+		if err != nil {
+			c.JSON(500, gin.H{"Error": err})
+		} else {
+			c.JSON(201, gin.H{"success": result})
+		}
+	})
+
+	// As a manager, I want to be able to assign a shift, by changing the employee that will work a shift:
+	manager.PUT("/shifts/assign", func(c *gin.Context) {
+		var shift Shift
+		c.BindJSON(&shift)
+		result := scheduleEmployee(shift)
+		if err != nil {
+			c.JSON(500, gin.H{"Error": err})
+		} else {
+			c.JSON(201, gin.H{"success": result})
+		}
+	})
+
+	// As a manager, I want to be able to change a shift, by updating the time details:
+	manager.PUT("/shifts", func(c *gin.Context) {
+		var shift Shift
+		c.BindJSON(&shift)
+		result := editShiftTime(shift)
+		if err != nil {
+			c.JSON(500, gin.H{"Error": err})
+		} else {
+			c.JSON(201, gin.H{"success": result})
+		}
+	})
+
+	// As a manager, I want to contact an employee, by seeing employee details:
+	// // get all employees
+	routes.GET("/employees", func(c *gin.Context) {
+		results := getAllEmployees()
+		c.JSON(200, results)
+	})
+
+	// // get single employee by id
+	routes.GET("/employees/:id", func(c *gin.Context) {
+		id := stringToInt64(c.Param("id"))
+		result := getEmployeeByID(id)
+		c.JSON(200, result)
+	})
+
 	routes.Run()
 }
-
-// Routes not explicitly needed for user stories:
-
-// get all users
-// routes.GET("/users", func(c *gin.Context) {
-// 	results := getAllUsers()
-// 	c.JSON(200, results)
-// })
-
-// get single user by id
-// routes.GET("/users/:id", func(c *gin.Context) {
-// 	id := stringToInt64(c.Param("id"))
-// 	result := getUserByID(id)
-// 	c.JSON(200, result)
-// })
-
-// get all shifts
-// routes.GET("/shifts", func(c *gin.Context) {
-// 	results := getAllShifts()
-// 	c.JSON(http.StatusOK, results)
-// })
-
-// get all users with role of manager
-// routes.GET("/managers", func(c *gin.Context) {
-// 	results := getAllManagers()
-// 	c.JSON(200, results)
-// })
-
-// get single manager by id
-// routes.GET("/managers/:id", func(c *gin.Context) {
-// 	id := stringToInt64(c.Param("id"))
-// 	result := getManagerByID(id)
-// 	c.JSON(200, result)
-// })
-// get all users with role of employee
