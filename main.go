@@ -46,13 +46,6 @@ func main() {
 		c.JSON(200, results)
 	})
 
-	// As an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts:
-	routes.GET("/mymanagers/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
-		results := getManagerRostersByDateRange(id)
-		c.JSON(200, results)
-	})
-
 	// As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week:
 	// // TODO: add math for subtracting break time from total hours
 	// // TODO: only total hours for dates in past
@@ -78,6 +71,13 @@ func main() {
 		}
 		summary := Hours{results, totalHours}
 		c.JSON(200, summary)
+	})
+
+	// As an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts:
+	routes.GET("/mymanagers/:id", func(c *gin.Context) {
+		id := stringToInt64(c.Param("id"))
+		results := getManagerRostersByDateRange(id)
+		c.JSON(200, results)
 	})
 
 	// // MANAGER user stories:
