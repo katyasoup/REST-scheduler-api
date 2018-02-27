@@ -9,7 +9,7 @@ import (
 const (
 	host   = "localhost"
 	port   = 5432
-	user   = "Katie"
+	user   = "postgres"
 	dbname = "wiw-challenge"
 )
 
@@ -19,9 +19,9 @@ var err error
 
 // OpenDatabase : opens connection to database
 func OpenDatabase() {
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s "+
 		"dbname=%s sslmode=disable",
-		host, port, user, dbname)
+		host, port, user, "yourPassword", dbname)
 	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
@@ -158,6 +158,11 @@ func createShift(shift Shift) Shift {
 	queryString := "INSERT INTO shifts(manager_id, break, start_time, end_time) VALUES($1, $2, $3, $4);"
 	executeStatement(queryString, shift.Manager, shift.Break.Float64, shift.Start, shift.End)
 	return getNewestShift()
+}
+
+func getUnassignedShifts() []Shift {
+	shiftRows := selectMany("SELECT * FROM shifts WHERE employee_id IS NULL")
+	return multipleRowsToShifts(shiftRows)
 }
 
 // As a manager, I want to be able to assign a shift, by changing the employee that will work a shift:

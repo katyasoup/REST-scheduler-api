@@ -30,17 +30,17 @@ func main() {
 	// // EMPLOYEE user stories:
 
 	// As an employee, I want to know when I am working, by being able to see all of the shifts assigned to me:
-	routes.GET("/myshifts/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
+	routes.GET("/myshifts/:empID", func(c *gin.Context) {
+		id := stringToInt64(c.Param("empID"))
 		results := getShiftsByEmployee(id)
 		c.JSON(200, results)
 	})
 
 	// As an employee, I want to know who I am working with, by being able to see the
 	// employees that are working during the same time period as me:
-	routes.GET("/roster/:start/:end", func(c *gin.Context) {
-		start := c.Params.ByName("start")
-		end := c.Params.ByName("end")
+	routes.GET("/roster/:startDate/:endDate", func(c *gin.Context) {
+		start := c.Param("startDate")
+		end := c.Param("endDate")
 		results := getEmployeeRostersByDateRange(start, end)
 		c.JSON(200, results)
 	})
@@ -48,10 +48,10 @@ func main() {
 	// As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week:
 	// // TODO: add math for subtracting break time from total hours
 	// // TODO: only total hours for dates in past
-	routes.GET("/hours/:id/:start/:end", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
-		start := c.Params.ByName("start")
-		end := c.Params.ByName("end")
+	routes.GET("/hours/:empID/:startDate/:endDate", func(c *gin.Context) {
+		id := stringToInt64(c.Param("empID"))
+		start := c.Param("startDate")
+		end := c.Param("endDate")
 		results := getShiftsByEmployeeInDateRange(id, start, end)
 		var totalHours int
 
@@ -73,8 +73,8 @@ func main() {
 	})
 
 	// As an employee, I want to be able to contact my managers, by seeing manager contact information for my shifts:
-	routes.GET("/mymanagers/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
+	routes.GET("/mymanagers/:empID", func(c *gin.Context) {
+		id := stringToInt64(c.Param("empID"))
 		results := getManagerRostersByDateRange(id)
 		c.JSON(200, results)
 	})
@@ -83,9 +83,9 @@ func main() {
 
 	// As a manager, I want to see the schedule, by listing shifts within a specific time period:
 	// // NOTE route listed as "/schedule/:start/:end" because "/shifts/:start/:end" conflicts with "/shifts/:id"
-	routes.GET("/schedule/:start/:end", func(c *gin.Context) {
-		start := c.Params.ByName("start")
-		end := c.Params.ByName("end")
+	routes.GET("/schedule/:startDate/:endDate", func(c *gin.Context) {
+		start := c.Param("startDate")
+		end := c.Param("endDate")
 		results := getShiftsByDateRange(start, end)
 		c.JSON(200, results)
 	})
@@ -100,6 +100,12 @@ func main() {
 		} else {
 			c.JSON(201, gin.H{"success": result})
 		}
+	})
+
+	// see all unassigned shifts
+	routes.GET("/shifts/unassigned", func(c *gin.Context) {
+		results := getUnassignedShifts()
+		c.JSON(200, results)
 	})
 
 	// As a manager, I want to be able to assign a shift, by changing the employee that will work a shift:
@@ -134,8 +140,8 @@ func main() {
 	})
 
 	// // get single employee by id
-	routes.GET("/employees/:id", func(c *gin.Context) {
-		id := stringToInt64(c.Param("id"))
+	routes.GET("/employees/:empID", func(c *gin.Context) {
+		id := stringToInt64(c.Param("empID"))
 		result := getEmployeeByID(id)
 		c.JSON(200, result)
 	})

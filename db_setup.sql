@@ -1,3 +1,6 @@
+-- DROP TABLE shifts;
+-- DROP TABLE users;
+
 CREATE TABLE users (
 	id BIGSERIAL PRIMARY KEY,
 	name VARCHAR NOT NULL,
