@@ -116,7 +116,7 @@ func main() {
 		if err != nil {
 			c.JSON(500, gin.H{"Error": err})
 		} else {
-			c.JSON(201, gin.H{"success": result})
+			c.JSON(202, gin.H{"success": result})
 		}
 	})
 
@@ -128,7 +128,7 @@ func main() {
 		if err != nil {
 			c.JSON(500, gin.H{"Error": err})
 		} else {
-			c.JSON(201, gin.H{"success": result})
+			c.JSON(202, gin.H{"success": result})
 		}
 	})
 
