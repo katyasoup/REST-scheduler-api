@@ -24,10 +24,6 @@ func main() {
 
 	routes := gin.Default()
 
-	manager := routes.Group("/", gin.BasicAuth(gin.Accounts{
-		"manager": "password",
-	}))
-
 	routes.GET("/", func(c *gin.Context) {
 		c.JSON(200, "Hey there, thanks for checking out my project! -Katie")
 	})
@@ -95,7 +91,7 @@ func main() {
 	})
 
 	// As a manager, I want to schedule my employees, by creating shifts for any employee:
-	manager.POST("/shifts", func(c *gin.Context) {
+	routes.POST("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := createShift(shift)
@@ -107,7 +103,7 @@ func main() {
 	})
 
 	// As a manager, I want to be able to assign a shift, by changing the employee that will work a shift:
-	manager.PUT("/shifts/assign", func(c *gin.Context) {
+	routes.PUT("/shifts/assign", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := scheduleEmployee(shift)
@@ -119,7 +115,7 @@ func main() {
 	})
 
 	// As a manager, I want to be able to change a shift, by updating the time details:
-	manager.PUT("/shifts", func(c *gin.Context) {
+	routes.PUT("/shifts", func(c *gin.Context) {
 		var shift Shift
 		c.BindJSON(&shift)
 		result := editShiftTime(shift)
