@@ -9,7 +9,7 @@ import (
 const (
 	host   = "localhost"
 	port   = 5432
-	user   = "Katie"
+	user   = "postgres"
 	dbname = "wiw-challenge"
 )
 
@@ -21,7 +21,7 @@ var err error
 func OpenDatabase() {
 	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s password=%s "+
 		"dbname=%s sslmode=disable",
-		host, port, user, "eggplant", dbname)
+		host, port, user, "yourPassword", dbname)
 	db, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
 		panic(err)
