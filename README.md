@@ -41,7 +41,8 @@ Access the following information by supplying as needed:
 - for PUT and POST routes, send data as type ```application/x-www-form-url-encoded```
 
 ex. POST:
-```{  
+```
+{  
 "manager": 7,  
 "break": 1,  
 "startTime": "2018-04-08T13:00:00Z",  
@@ -50,14 +51,16 @@ ex. POST:
 ```
 
 ex. PUT: (assign employee)  
-```{
+```
+{
 "employee": 1,
 "id": 20
 }
 ```
 
 ex. PUT: (edit times)  
-```{
+```
+{
 "startTime": "2018-03-06T09:00:00Z",
 "endTime": "2018-03-06T15:00:00Z",
 "id": 16
