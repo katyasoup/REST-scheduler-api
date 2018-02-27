@@ -11,22 +11,22 @@ type User struct {
 	ID      int64
 	Name    string
 	Role    string
-	Email   string
-	Phone   string
+	Email   NullString
+	Phone   NullString
 	Created string
 	Updated string
 }
 
 // Shift : maps to row from shifts table
 type Shift struct {
-	ID       int64     `json:"id"`
-	Manager  int64     `json:"manager"`
-	Employee NullInt64 `json:"employee"`
-	Break    float64   `json:"break"`
-	Start    string    `json:"startTime"`
-	End      string    `json:"endTime"`
-	Created  string    `json:"createdAt"`
-	Updated  string    `json:"updatedAt"`
+	ID       int64       `json:"id"`
+	Manager  int64       `json:"manager"`
+	Employee NullInt64   `json:"employee"`
+	Break    NullFloat64 `json:"break"`
+	Start    string      `json:"startTime"`
+	End      string      `json:"endTime"`
+	Created  string      `json:"createdAt"`
+	Updated  string      `json:"updatedAt"`
 }
 
 // Roster : maps to row from join on shifts and users table

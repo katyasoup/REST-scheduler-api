@@ -32,11 +32,11 @@ CREATE TABLE shifts (
 );
 
 -- March 1
-INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, null, 0.5, '2018-03-01 09:00:00', '2018-03-01 13:00:00');
-INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, null, 0.5, '2018-03-01 09:00:00', '2018-03-01 13:00:00');
-INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, null, 0.5, '2018-03-01 13:00:00', '2018-03-01 17:00:00');
-INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, null, 0.5, '2018-03-01 13:00:00', '2018-03-01 17:00:00');
-INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, null, 1, '2018-03-01 09:00:00', '2018-03-01 17:00:00');
+INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, 3, 0.5, '2018-03-01 09:00:00', '2018-03-01 13:00:00');
+INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, 1, 0.5, '2018-03-01 09:00:00', '2018-03-01 13:00:00');
+INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, 2, 0.5, '2018-03-01 13:00:00', '2018-03-01 17:00:00');
+INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, 4, 0.5, '2018-03-01 13:00:00', '2018-03-01 17:00:00');
+INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (6, 5, 1, '2018-03-01 09:00:00', '2018-03-01 17:00:00');
 
 -- March 2
 INSERT INTO public.shifts(manager_id, employee_id, break, start_time, end_time) VALUES (7, null, 0.5, '2018-03-02 09:00:00', '2018-03-02 13:00:00');
