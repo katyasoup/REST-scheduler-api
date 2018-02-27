@@ -188,7 +188,7 @@ func execute(queryString string, args ...interface{}) {
 
 func createShift(shift Shift) Shift {
 	queryString := "INSERT INTO public.shifts(manager_id, break, start_time, end_time) VALUES($1, $2, $3, $4);"
-	execute(queryString, shift.Manager, shift.Break, shift.Start, shift.End)
+	execute(queryString, shift.Manager, shift.Break.Float64, shift.Start, shift.End)
 	return getShift(fmt.Sprintf("SELECT * FROM public.shifts WHERE id=MAX"))
 }
 
