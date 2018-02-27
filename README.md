@@ -15,7 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 [Restlet Client](https://chrome.google.com/webstore/detail/restlet-client-rest-api-t/aejoelaoggembcahagimdiliamlcdmfm), [Postman](https://www.getpostman.com/) or other REST client of your choice
 
 ### Install
-Download and install Go: [Golang Installation Guide] (https://golang.org/doc/install)  
+Download and install Go: [Golang Installation Guide](https://golang.org/doc/install)  
 
 Download and install Gin: ```$ go get github.com/gin-gonic/gin```
 
