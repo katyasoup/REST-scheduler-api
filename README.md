@@ -29,7 +29,7 @@ Set up your PostgresSQL database:
 - Download and clone the project files: ```git clone https://github.com/katyasoup/wiw-challenge.git```
 - Adjust database variables in ```database.go``` as needed at lines 9 and 21 
 	- If you did not set up a username and password in Postgres, use default user "postgres" and remove password fields from line 9 ```const``` and line 22 ```psqlInfo```
-	- ```dbname``` is the name of the database you where you created your tables  
+	- ```dbname``` is the name of the database where you created your tables  
 - Spin it up! ```go run main.go types.go database.go``` The project will be available on port 8080
 
 
@@ -83,7 +83,6 @@ ex. PUT: (edit times)
 	- ex. [http://localhost:8080/mymanagers/1](http://localhost:8080/mymanagers/1)
 - [x] As a manager, I want to schedule my employees, by creating shifts for any employee.
 	- 	POST: ```/shifts```
-	-  To see currently unassigned shifts: [http://localhost:8080/shifts/unassigned](http://localhost:8080/shifts/unassigned)
 - [x] As a manager, I want to see the schedule, by listing shifts within a specific time period.
 	- GET: ```/schedule/:start/:end```
 	- ex. [http://localhost:8080/schedule/2018-03-01T09:00:00Z/2018-03-04T17:00:00Z](http://localhost:8080/schedule/2018-03-01T09:00:00Z/2018-03-04T17:00:00Z)
@@ -91,6 +90,7 @@ ex. PUT: (edit times)
 	- 	PUT: ```/shifts```
 - [x] As a manager, I want to be able to assign a shift, by changing the employee that will work a shift.
 	- 	PUT: ```/shifts/assign```
+	-  To see currently unassigned shifts: [http://localhost:8080/shifts/unassigned](http://localhost:8080/shifts/unassigned)
 - [x] As a manager, I want to contact an employee, by seeing employee details.
 	- GET: ```/employees``` or ```/employees/:id```
 	- ex. [http://localhost8080/employees](http://localhost:8080/employees)
