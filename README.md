@@ -26,11 +26,11 @@ Set up your PostgresSQL database:
 - Run the script from ```db_setup.sql``` to create and populate your tables
 
 ### Run
-- Download and clone the project files: ```git clone https://github.com/katyasoup/wiw-challenge.git```
+- Download and clone the project files: ```$ git clone https://github.com/katyasoup/wiw-challenge.git```
 - Adjust database variables in ```database.go``` as needed at lines 9 and 21 
 	- If you did not set up a username and password in Postgres, use default user "postgres" and remove password fields from line 9 ```const``` and line 22 ```psqlInfo```
 	- ```dbname``` is the name of the database where you created your tables  
-- Spin it up! ```go run main.go types.go database.go``` The project will be available on port 8080
+- Spin it up! ```$ go run main.go types.go database.go``` The project will be available on port 8080
 
 
 ## Acessing the API endpoints
