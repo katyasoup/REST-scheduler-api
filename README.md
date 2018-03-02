@@ -74,7 +74,7 @@ ex. PUT: (edit times)
 	- ex. [http://localhost:8080/myshifts/2](http://localhost:8080/myshifts/2)
 - [x] As an employee, I want to know who I am working with, by being able to see the employees that are working during the same time period as me.
 	- GET: ```/roster/:startDate/:endDate```
-	- ex. [http://localhost:8080/roster/2/2018-03-01T09:00:00/2018-03-01T17:00:00Z](http://localhost:8080/roster/2/2018-03-01T09:00:00/2018-03-01T17:00:00Z)
+	- ex. [http://localhost:8080/roster/2018-03-01T09:00:00/2018-03-01T17:00:00Z](http://localhost:8080/roster/2018-03-01T09:00:00/2018-03-01T17:00:00Z)
 - [x] As an employee, I want to know how much I worked, by being able to get a summary of hours worked for each week.
 	- GET: ```/hours/:empID/:startDate/:endDate```
 	- ex. [http://localhost:8080/hours/4/2018-03-01T09:00:00Z/2018-03-07T17:00:00Z](http://localhost:8080/hours/4/2018-03-01T09:00:00Z/2018-03-07T17:00:00Z)
